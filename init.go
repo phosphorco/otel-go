@@ -257,6 +257,11 @@ func ConfiguredMetricExporter(ctx context.Context) (sdkmetric.Exporter, bool) {
 		if err != nil {
 			slog.Warn("failed to configure metrics", "error", err)
 		}
+		// PHOSPHOR PATCH-FOR-THE-PATCH: keep HTTP retries out of engine
+		// stream consumers. Rebase with the bounded queue/context tests.
+		if configuredMetricExporter != nil {
+			configuredMetricExporter = NewQueuedMetricExporter(configuredMetricExporter)
+		}
 	})
 	return configuredMetricExporter, configuredMetricExporter != nil
 }
